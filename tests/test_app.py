@@ -30,3 +30,25 @@ def test_signup_rejects_duplicate_email():
     response = client.post("/activities/Chess Club/signup?email=duplicate@mergington.edu")
     assert response.status_code == 400
     assert response.json()["detail"] == "Student is already signed up"
+
+
+def test_signup_normalizes_email_address():
+    response = client.post("/activities/Art Studio/signup?email=  NEW@MERGINGTON.EDU  ")
+    assert response.status_code == 200
+    assert "new@mergington.edu" in response.json()["message"]
+
+
+def test_signup_rejects_invalid_email():
+    response = client.post("/activities/Art Studio/signup?email=not-an-email")
+    assert response.status_code == 422
+    assert response.json()["detail"] == "A valid email address is required"
+
+
+def test_signup_rejects_full_activity():
+    activity = "Science Club"
+    for index in range(20):
+        client.post(f"/activities/{activity}/signup?email=student{index}@mergington.edu")
+
+    response = client.post(f"/activities/{activity}/signup?email=overflow@mergington.edu")
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Activity is full"
