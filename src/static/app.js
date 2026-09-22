@@ -19,27 +19,33 @@ document.addEventListener("DOMContentLoaded", () => {
         activityCard.className = "activity-card";
 
         const spotsLeft = details.max_participants - details.participants.length;
-        const participantsList = details.participants.length
-          ? details.participants
-              .map((participant) => `<li class="participant-item">${participant}</li>`)
-              .join("")
-          : '<li class="participant-empty">No participants yet.</li>';
+        const participants = details.participants.length > 0 ? details.participants : ["No participants yet"];
+
+        const participantsList = document.createElement("ul");
+        participantsList.className = "participants-list";
+
+        participants.forEach((participant) => {
+          const item = document.createElement("li");
+          item.textContent = participant;
+          if (participant === "No participants yet") {
+            item.classList.add("empty");
+          }
+          participantsList.appendChild(item);
+        });
 
         activityCard.innerHTML = `
-          <div class="activity-header">
-            <h4>${name}</h4>
-            <span class="spots-badge">${spotsLeft} spots left</span>
-          </div>
+          <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <div class="participants-section">
-            <h5>Participants</h5>
-            <ul class="participant-list">
-              ${participantsList}
-            </ul>
-          </div>
+          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
         `;
 
+        const participantsSection = document.createElement("div");
+        participantsSection.className = "participants-section";
+        participantsSection.innerHTML = "<h5>Participants</h5>";
+        participantsSection.appendChild(participantsList);
+
+        activityCard.appendChild(participantsSection);
         activitiesList.appendChild(activityCard);
 
         // Add option to select dropdown
