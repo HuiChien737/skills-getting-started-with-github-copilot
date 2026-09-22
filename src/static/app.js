@@ -34,8 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Function to fetch activities from API
   async function fetchActivities() {
+    const currentSelection = activitySelect.value;
     try {
       const response = await fetch("/activities");
       const activities = await response.json();
@@ -101,6 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
         option.textContent = name;
         activitySelect.appendChild(option);
       });
+
+      if (currentSelection) {
+        activitySelect.value = currentSelection;
+      }
     } catch (error) {
       activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
       console.error("Error fetching activities:", error);
@@ -127,8 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.ok) {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
-        signupForm.reset();
         await fetchActivities();
+        signupForm.reset();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
