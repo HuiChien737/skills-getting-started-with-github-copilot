@@ -52,3 +52,18 @@ def test_signup_rejects_full_activity():
     response = client.post(f"/activities/{activity}/signup?email=overflow@mergington.edu")
     assert response.status_code == 400
     assert response.json()["detail"] == "Activity is full"
+
+
+def test_unregister_participant_removes_email_from_activity():
+    activity_name = "Chess Club"
+    email = "michael@mergington.edu"
+
+    response = client.delete(f"/activities/{activity_name}/unregister?email={email}")
+
+    assert response.status_code == 200
+    assert email not in response.json()["participants"] or response.json()["participants"] == []
+
+    activities = client.get("/activities").json()
+    assert email not in activities[activity_name]["participants"]
+
+    client.post(f"/activities/{activity_name}/signup?email={email}")
